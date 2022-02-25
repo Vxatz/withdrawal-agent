@@ -1,4 +1,4 @@
-import { HandleTransaction, TransactionEvent, LogDescription, getEthersProvider} from 'forta-agent';
+import { HandleTransaction, TransactionEvent, LogDescription, getEthersProvider } from 'forta-agent';
 import utils, { AMP_CONTRACT, FLEXA_MANAGER_CONTRACT } from './utils';
 import PartitionsFetcher from './partition.fetcher';
 import { BigNumber } from 'ethers';
@@ -11,54 +11,61 @@ export const provideHandleTransaction = (
 ): HandleTransaction =>
   async (txEvent: TransactionEvent) => {
     const block: number = txEvent.blockNumber;
-    // let partitions: string[] = [];
+    let partitions: string[] = [];
+    const eventsMap: LogDescription[] = [];
 
-    // let partitionEvent: LogDescription = (txEvent.filterLog(utils.FLEXA_PARTITIONS_ABI, fetcher.manager))[0];
-    // let withdrawalEvent: LogDescription = (txEvent.filterLog(utils.FLEXA_ABI, fetcher.manager))[0];
-    let transferByPartitionEvent: LogDescription = (txEvent.filterLog(utils.AMP_ABI, AMP_CONTRACT))[0];
-
-    // if (partitionEvent) {
-    //   partitions.indexOf(partitionEvent.args["partition"]) === -1 ? partitions.push(partitionEvent.args["partition"]) : partitions = partitions.filter(partition => partition !== partitionEvent.args["partition"]);
-    // }
+    const partitionEvents: LogDescription[] = (txEvent.filterLog(utils.FLEXA_PARTITIONS_ABI, fetcher.manager)).filter((log: LogDescription) => log.name === 'PartitionAdded' || log.name === 'PartitionRemoved');
+    const withdrawalEvents: LogDescription[] = (txEvent.filterLog(utils.FLEXA_ABI, fetcher.manager)).filter((log: LogDescription) => log.name === 'Withdrawal' || log.name === 'FallBackWithdrawal');
+    const transferByPartitionEvents: LogDescription[] = (txEvent.filterLog(utils.AMP_ABI, AMP_CONTRACT)).filter((log: LogDescription) => log.name === 'TransferByPartition')
+  
+    const handlePartitionEvent = async (event: LogDescription) => {
+      partitions.indexOf(event.args["partition"]) === -1 ? partitions.push(event.args["partition"]) : partitions = partitions.filter((p) => (p) !== event.args["partition"]);
+      eventsMap.push(event);
+    }
     
-    // if (withdrawalEvent) {
-    //   const partition: string = withdrawalEvent.args["partition"];
-    //   const totalPartitionSupply: BigNumber = await fetcher.getTotalSupplyByPartition(partition);
+    const handleWithdrawalEvent = async (event: LogDescription) => {
+      const partition: string = event.args["partition"];
+      const totalPartitionSupply: BigNumber = await fetcher.getTotalSupplyByPartition(block, partition);
+      if (BigNumber.from(event.args["amount"]).gt((BigNumber.from(totalPartitionSupply).mul(percent).div(100000000000)))) {
+        eventsMap.push(event);
+      }
+    }
 
-    //   const filterEvent: LogDescription[] = txEvent
-    //     .filterLog(utils.FLEXA_ABI, fetcher.manager)
-    //     .filter((log: LogDescription) => 
-    //       BigNumber.from(log.args["amount"])
-    //       .gt((BigNumber.from(totalPartitionSupply.toString()).mul(percent).div(10000000000000))
-    //     ));  
-      
-    //   return filterEvent.map(utils.createFinding);
-    // } 
-
-    if (transferByPartitionEvent) {
-        const from: string = (transferByPartitionEvent.args["from"]);
-        if (from.toLowerCase() == FLEXA_MANAGER_CONTRACT) {
-
-          const fromPartition = transferByPartitionEvent.args["fromPartition"];
-          const isFlexaPartition: boolean = await fetcher.isPartition(block, fromPartition); 
-
+    const handleTransferByPartitionEvent = async (event: LogDescription) => {
+      const from: string = (event.args["from"]);
+        if (from.toLowerCase() === FLEXA_MANAGER_CONTRACT) {
+          const fromPartition: string = event.args["fromPartition"];
+          const isFlexaPartition: boolean =  await fetcher.isPartition(block, fromPartition); 
           if (isFlexaPartition) {
             const totalPartitionSupply: BigNumber = await fetcher.getTotalSupplyByPartition(block, fromPartition);
-
-            const filterEvent: LogDescription[] = txEvent
-              .filterLog(utils.AMP_ABI, AMP_CONTRACT)
-              .filter((log: LogDescription) =>
-                BigNumber.from(log.args["value"])
-                .gt((BigNumber.from(totalPartitionSupply.toString()).mul(percent).div(100))
-              ));
-
-            return filterEvent.map(utils.createFinding);
+            if (BigNumber.from(event.args["value"]).gt((BigNumber.from(totalPartitionSupply).mul(percent).div(100000000000)))) {
+              eventsMap.push(event);
+            }                
           }
-        }
-        return []
-    } else return []
-   }  
-  
+        }        
+     }
+
+    if (transferByPartitionEvents) {
+      for (let i=0; i<transferByPartitionEvents.length; i++) {
+        await handleTransferByPartitionEvent(transferByPartitionEvents[i]);
+      }
+    }
+
+    if (withdrawalEvents) {
+      for (let i=0; i<withdrawalEvents.length; i++) {
+        await handleWithdrawalEvent(withdrawalEvents[i]);
+      }
+    }
+
+    if (partitionEvents) {
+      for (let i=0; i<partitionEvents.length; i++) {
+       handlePartitionEvent(partitionEvents[i]);
+      }
+    }
+
+    return eventsMap.map(utils.createFinding);
+  }  
+
 export default {
   handleTransaction: provideHandleTransaction(new PartitionsFetcher(FLEXA_MANAGER_CONTRACT, getEthersProvider()), PERCENT),
 };

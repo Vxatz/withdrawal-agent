@@ -16,7 +16,7 @@ const DATA: [string, string, number][] = [
 
 describe("PartitionsFetcher test suite", () => {
     const mockProvider: MockEthersProvider = new MockEthersProvider();
-    const flexa: string = "0xaaaaaa";
+    const flexa: string = createAddress("0xaaaaa");
     const fetcher: PartitionsFetcher = new PartitionsFetcher(flexa, mockProvider as any);
 
     beforeEach(() => {
@@ -33,8 +33,8 @@ describe("PartitionsFetcher test suite", () => {
     });
 
     it("should return false when isPartition is called with address that is not a partition", async () => {
-        for(let [addr, partition, block] of DATA){
-            mockProvider.addCallTo(addr, block, AMP_IFACE, "partitions", { inputs:[partition], outputs:[false]})
+        for(let [, partition, block] of DATA){
+            //mockProvider.addCallTo(addr, block, AMP_IFACE, "partitions", { inputs:[partition], outputs:[false]})
             expect(await fetcher.isPartition(block, partition)).toStrictEqual(false);
     }
     })

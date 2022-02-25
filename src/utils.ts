@@ -21,7 +21,7 @@ const AMP_ABI: string[] = [
 const withdrawalFinding = (log: LogDescription): Finding => Finding.fromObject({
   name: "Flexa Collateral Manager high withdrawal detected",
   description: "High Withdrawal",
-  alertId: "flexa-1-1",
+  alertId: "flexa-02-1",
   severity: FindingSeverity.Info,
   type: FindingType.Suspicious,
   protocol: "Flexa",
@@ -35,7 +35,7 @@ const withdrawalFinding = (log: LogDescription): Finding => Finding.fromObject({
 const fallbackWithdrawalFinding = (log: LogDescription): Finding => Finding.fromObject({
   name: "Flexa Collateral Manager high fallback withdrawal detected",
   description: "High Fallback Withdrawal",
-  alertId: "flexa-1-2",
+  alertId: "flexa-02-2",
   severity: FindingSeverity.Info,
   type: FindingType.Suspicious,
   protocol: "Flexa",
@@ -49,7 +49,7 @@ const fallbackWithdrawalFinding = (log: LogDescription): Finding => Finding.from
 const transferByPartitionFinding = (log: LogDescription): Finding => Finding.fromObject({
   name: "Flexa Collateral Manager high transfer by partition detected",
   description: "High Transfer by Partition",
-  alertId: "flexa-1-3",
+  alertId: "flexa-02-3",
   severity: FindingSeverity.Info,
   type: FindingType.Suspicious,
   protocol: "Flexa",
@@ -61,36 +61,36 @@ const transferByPartitionFinding = (log: LogDescription): Finding => Finding.fro
   }
 });
 
-// const partitionAddedFinding = (log: LogDescription): Finding => Finding.fromObject({
-//   name: "Flexa Collateral Manager partition addition detected",
-//   description: "Partition Added",
-//   alertId: "flexa-1-4",
-//   severity: FindingSeverity.Info,
-//   type: FindingType.Suspicious,
-//   protocol: "Flexa",
-//   metadata: {
-//     partition: log.args['partition'].toLowerCase(),
-//   }
-// });
+const partitionAddedFinding = (log: LogDescription): Finding => Finding.fromObject({
+  name: "Flexa Collateral Manager partition addition detected",
+  description: "Partition Added",
+  alertId: "flexa-02-4",
+  severity: FindingSeverity.Info,
+  type: FindingType.Suspicious,
+  protocol: "Flexa",
+  metadata: {
+    partition: log.args['partition'].toLowerCase(),
+  }
+});
 
-// const partitionRemovedFinding = (log: LogDescription): Finding => Finding.fromObject({
-//   name: "Flexa Collateral Manager partition remove detected",
-//   description: "Partition Removed",
-//   alertId: "flexa-1-5",
-//   severity: FindingSeverity.Info,
-//   type: FindingType.Suspicious,
-//   protocol: "Flexa",
-//   metadata: {
-//     partition: log.args['partition'].toLowerCase(),
-//   }
-// });
+const partitionRemovedFinding = (log: LogDescription): Finding => Finding.fromObject({
+  name: "Flexa Collateral Manager partition remove detected",
+  description: "Partition Removed",
+  alertId: "flexa-02-5",
+  severity: FindingSeverity.Info,
+  type: FindingType.Suspicious,
+  protocol: "Flexa",
+  metadata: {
+    partition: log.args['partition'].toLowerCase(),
+  }
+});
 
 const findingsMap: Record<string, (_: LogDescription) => Finding> = {
   "Withdrawal": withdrawalFinding,
   "FallbackWithdrawal": fallbackWithdrawalFinding,
   "TransferByPartition": transferByPartitionFinding,
-  // "PartitionAdded": partitionAddedFinding,
-  // "PartitionRemoved": partitionRemovedFinding
+  "PartitionAdded": partitionAddedFinding,
+  "PartitionRemoved": partitionRemovedFinding
 };
 
 const createFinding = (log: LogDescription): Finding => findingsMap[log.name](log);
