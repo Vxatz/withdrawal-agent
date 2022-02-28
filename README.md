@@ -4,7 +4,6 @@
 
 This agent detects large transfers from Flexa Manager contract partitions.
 
-> Jars are fetched from PickleRegistry 0xF7C2DCFF5E947a617288792e289984a2721C4671
 
 ## Supported Chains
 
