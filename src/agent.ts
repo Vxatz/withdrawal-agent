@@ -11,25 +11,25 @@ export const provideHandleTransaction = (
 ): HandleTransaction =>
   async (txEvent: TransactionEvent) => {
     const block: number = txEvent.blockNumber;
-    let partitions: string[] = [];
     const eventsMap: LogDescription[] = [];
 
-    const partitionEvents: LogDescription[] = (txEvent.filterLog(utils.FLEXA_PARTITIONS_ABI, fetcher.manager)).filter((log: LogDescription) => log.name === 'PartitionAdded' || log.name === 'PartitionRemoved');
-    const withdrawalEvents: LogDescription[] = (txEvent.filterLog(utils.FLEXA_ABI, fetcher.manager)).filter((log: LogDescription) => log.name === 'Withdrawal' || log.name === 'FallBackWithdrawal');
-    const transferByPartitionEvents: LogDescription[] = (txEvent.filterLog(utils.AMP_ABI, AMP_CONTRACT)).filter((log: LogDescription) => log.name === 'TransferByPartition')
+    // let partitions: string[] = [];
+    // const partitionEvents: LogDescription[] = (txEvent.filterLog(utils.FLEXA_PARTITIONS_ABI, fetcher.manager));
+    // const withdrawalEvents: LogDescription[] = (txEvent.filterLog(utils.FLEXA_ABI, fetcher.manager));
+    const transferByPartitionEvents: LogDescription[] = (txEvent.filterLog(utils.AMP_ABI, AMP_CONTRACT));
   
-    const handlePartitionEvent = async (event: LogDescription) => {
-      partitions.indexOf(event.args["partition"]) === -1 ? partitions.push(event.args["partition"]) : partitions = partitions.filter((p) => (p) !== event.args["partition"]);
-      eventsMap.push(event);
-    }
+    // const handlePartitionEvent = async (event: LogDescription) => {
+    //   partitions.indexOf(event.args["partition"]) === -1 ? partitions.push(event.args["partition"]) : partitions = partitions.filter((p) => (p) !== event.args["partition"]);
+    //   eventsMap.push(event);
+    // }
     
-    const handleWithdrawalEvent = async (event: LogDescription) => {
-      const partition: string = event.args["partition"];
-      const totalPartitionSupply: BigNumber = await fetcher.getTotalSupplyByPartition(block, partition);
-      if (BigNumber.from(event.args["amount"]).gt((BigNumber.from(totalPartitionSupply).mul(percent).div(100000000000)))) {
-        eventsMap.push(event);
-      }
-    }
+    // const handleWithdrawalEvent = async (event: LogDescription) => {
+    //   const partition: string = event.args["partition"];
+    //   const totalPartitionSupply: BigNumber = await fetcher.getTotalSupplyByPartition(block, partition);
+    //   if (BigNumber.from(event.args["amount"]).gt((BigNumber.from(totalPartitionSupply).mul(percent).div(100000000000)))) {
+    //     eventsMap.push(event);
+    //   }
+    // }
 
     const handleTransferByPartitionEvent = async (event: LogDescription) => {
       const from: string = (event.args["from"]);
@@ -51,17 +51,17 @@ export const provideHandleTransaction = (
       }
     }
 
-    if (withdrawalEvents) {
-      for (let i=0; i<withdrawalEvents.length; i++) {
-        await handleWithdrawalEvent(withdrawalEvents[i]);
-      }
-    }
+    // if (withdrawalEvents) {
+    //   for (let i=0; i<withdrawalEvents.length; i++) {
+    //     await handleWithdrawalEvent(withdrawalEvents[i]);
+    //   }
+    // }
 
-    if (partitionEvents) {
-      for (let i=0; i<partitionEvents.length; i++) {
-       handlePartitionEvent(partitionEvents[i]);
-      }
-    }
+    // if (partitionEvents) {
+    //   for (let i=0; i<partitionEvents.length; i++) {
+    //    handlePartitionEvent(partitionEvents[i]);
+    //   }
+    // }
 
     return eventsMap.map(utils.createFinding);
   }  

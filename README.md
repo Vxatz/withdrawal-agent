@@ -1,3 +1,15 @@
+# Flexa Manager Large Transfers by Partition
+
+## Description
+
+This agent detects large transfers from Flexa Manager contract partitions.
+
+> Jars are fetched from PickleRegistry 0xF7C2DCFF5E947a617288792e289984a2721C4671
+
+## Supported Chains
+
+- Ethereum
+
 # Agent
 
 The agent behaviour can be verified with the following transactions:
