@@ -7,9 +7,9 @@ import { keccak256 } from "forta-agent/dist/sdk/utils";
 import {AMP_ABI} from "./utils";
 import { Interface } from "@ethersproject/abi";
 
-const SIGNATURE: string = "event TransferByPartition( bytes32 indexed fromPartition, address operator, address indexed from, address indexed to, uint256 value, bytes data, bytes operatorData )";
+// const SIGNATURE: string = "event TransferByPartition( bytes32 indexed fromPartition, address operator, address indexed from, address indexed to, uint256 value, bytes data, bytes operatorData )";
 const AMP_IFACE: Interface = new Interface(AMP_ABI);
-const SIGNATURE2: string = "TransferByPartition(bytes,address,address,address,uint256,bytes,bytes)";
+// const SIGNATURE2: string = "TransferByPartition(bytes,address,address,address,uint256,bytes,bytes)";
 const FLEXA_CONTRACT: string = createAddress("0xffff");
 const AMP_CONTRACT: string = createAddress("0xffff");
 
@@ -75,9 +75,9 @@ describe("Forta Manager high transfer by partition agent test suite", () => {
 
         const tx: TransactionEvent =  new TestTransactionEvent()
             .setBlock(42)
-            .setTo(PARTITIONS[0])
-            .setValue("100")
-            .setFrom(createAddress('0xaa34'))                      
+            // .setTo(PARTITIONS[0])
+            // .setValue("100")
+            // .setFrom(createAddress('0xaa34'))                      
             .addAnonymousEventLog(PARTITIONS[0], log1.data, ...log1.topics) 
             .addAnonymousEventLog(PARTITIONS[2], log2.data, ...log2.topics);        
 
