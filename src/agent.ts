@@ -1,71 +1,43 @@
-import { HandleTransaction, TransactionEvent, LogDescription, getEthersProvider } from 'forta-agent';
-import utils, { AMP_CONTRACT, FLEXA_MANAGER_CONTRACT } from './utils';
+import { Finding, HandleTransaction, TransactionEvent, LogDescription, getEthersProvider } from 'forta-agent';
+import utils, { createFinding, transferByPartitionFinding, AMP_CONTRACT, FLEXA_MANAGER_CONTRACT } from './utils';
 import PartitionsFetcher from './partition.fetcher';
+import SupplyFetcher from './supply.fetcher';
 import { BigNumber } from 'ethers';
 
 const PERCENT: BigNumber = BigNumber.from(1);
 
 export const provideHandleTransaction = (
-  fetcher: PartitionsFetcher,
+  amp_contract: string,
+  flexa_manager_contract: string,
+  partitionFetcher: PartitionsFetcher,
+  supplyFetcher: SupplyFetcher,
   percent: BigNumber,
 ): HandleTransaction =>
   async (txEvent: TransactionEvent) => {
-    const block: number = txEvent.blockNumber;
-    const eventsMap: LogDescription[] = [];
+    const block: number = txEvent.blockNumber;    
+    const findings: Finding[] = [];
 
-    // let partitions: string[] = [];
-    // const partitionEvents: LogDescription[] = (txEvent.filterLog(utils.FLEXA_PARTITIONS_ABI, fetcher.manager));
-    // const withdrawalEvents: LogDescription[] = (txEvent.filterLog(utils.FLEXA_ABI, fetcher.manager));
-    const transferByPartitionEvents: LogDescription[] = (txEvent.filterLog(utils.AMP_ABI, AMP_CONTRACT));
-  
-    // const handlePartitionEvent = async (event: LogDescription) => {
-    //   partitions.indexOf(event.args["partition"]) === -1 ? partitions.push(event.args["partition"]) : partitions = partitions.filter((p) => (p) !== event.args["partition"]);
-    //   eventsMap.push(event);
-    // }
-    
-    // const handleWithdrawalEvent = async (event: LogDescription) => {
-    //   const partition: string = event.args["partition"];
-    //   const totalPartitionSupply: BigNumber = await fetcher.getTotalSupplyByPartition(block, partition);
-    //   if (BigNumber.from(event.args["amount"]).gt((BigNumber.from(totalPartitionSupply).mul(percent).div(100000000000)))) {
-    //     eventsMap.push(event);
-    //   }
-    // }
-
-    const handleTransferByPartitionEvent = async (event: LogDescription) => {
-      const from: string = (event.args["from"]);
-        if (from.toLowerCase() === FLEXA_MANAGER_CONTRACT) {
-          const fromPartition: string = event.args["fromPartition"];
-          const isFlexaPartition: boolean =  await fetcher.isPartition(block, fromPartition); 
-          if (isFlexaPartition) {
-            const totalPartitionSupply: BigNumber = await fetcher.getTotalSupplyByPartition(block, fromPartition);
-            if (BigNumber.from(event.args["value"]).gt((BigNumber.from(totalPartitionSupply).mul(percent).div(100000000000)))) {
-              eventsMap.push(event);
-            }                
-          }
-        }        
-     }
-
-    if (transferByPartitionEvents) {
-      for (let i=0; i<transferByPartitionEvents.length; i++) {
-        await handleTransferByPartitionEvent(transferByPartitionEvents[i]);
+    const logs: LogDescription[] = (txEvent.filterLog(utils.AMP_ABI, amp_contract));
+    const isFlexaPartition: boolean[] = await Promise.all(
+      logs.map(log => partitionFetcher.isPartition(block, log.args["fromPartition"]))
+    );
+    const totalPartitionSupply: BigNumber[] = await Promise.all(
+      logs.map(log => supplyFetcher.getTotalSupplyByPartition(block, log.args["fromPartition"]))
+    )
+    logs.forEach((log, i) => {
+      const from: string = log.args["from"]
+      if (from.toLowerCase() === flexa_manager_contract) {
+        if (isFlexaPartition[i]) {
+          if (BigNumber.from(log.args["value"]).gt((BigNumber.from(totalPartitionSupply[i]).mul(percent).div(100)))) {
+              findings.push(createFinding(log));              
+            }  
+        }
       }
-    }
+    })
 
-    // if (withdrawalEvents) {
-    //   for (let i=0; i<withdrawalEvents.length; i++) {
-    //     await handleWithdrawalEvent(withdrawalEvents[i]);
-    //   }
-    // }
-
-    // if (partitionEvents) {
-    //   for (let i=0; i<partitionEvents.length; i++) {
-    //    handlePartitionEvent(partitionEvents[i]);
-    //   }
-    // }
-
-    return eventsMap.map(utils.createFinding);
+    return findings;    
   }  
 
 export default {
-  handleTransaction: provideHandleTransaction(new PartitionsFetcher(FLEXA_MANAGER_CONTRACT, getEthersProvider()), PERCENT),
+  handleTransaction: provideHandleTransaction(AMP_CONTRACT, FLEXA_MANAGER_CONTRACT, new PartitionsFetcher(FLEXA_MANAGER_CONTRACT, getEthersProvider()), new SupplyFetcher(AMP_CONTRACT, getEthersProvider()) , PERCENT),
 };

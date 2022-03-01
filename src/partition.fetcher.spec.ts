@@ -5,7 +5,6 @@ import utils from "./utils";
 import { BigNumber } from "ethers";
 import { keccak256 } from "forta-agent/dist/sdk/utils";
 
-const AMP_IFACE: Interface = new Interface(utils.AMP_ABI);
 const FLEXA_IFACE: Interface = new Interface(utils.FLEXA_ABI);
 
 //contract address, partition address, block number, isPartition
@@ -14,12 +13,6 @@ const WRONG_CONTRACT_DATA: [string, string, number, boolean][] = [
     [createAddress("0xa399"), keccak256("part2"), 12, true],
     [createAddress("0xa3aa"), keccak256("part3"), 13, false],
 ]
-
-const SUPPLY_DATA: [string, number, BigNumber][] = [
-    [keccak256("csfkfd"), 22, BigNumber.from(345325)],
-    [keccak256("gggggggg"), 23, BigNumber.from(324242)],
-]
-
 
 //partition address, block number, isPartition
 const PARTITIONS: [string, number, boolean][] = [
@@ -32,7 +25,6 @@ const PARTITIONS: [string, number, boolean][] = [
 describe("PartitionsFetcher test suite", () => {
     const mockProvider: MockEthersProvider = new MockEthersProvider();
     const flexa: string = createAddress("0xdead");
-    const amp: string = createAddress("0xdade");
     const fetcher: PartitionsFetcher = new PartitionsFetcher(flexa, mockProvider as any);
     
     beforeEach(() => {
@@ -64,14 +56,4 @@ describe("PartitionsFetcher test suite", () => {
             expect(value).toStrictEqual(isPart);  
         }                      
     })
-
-    it("should return the total supply of a partition", async () => {
-        for(let [part, block, supply] of SUPPLY_DATA) {
-            mockProvider.addCallTo(amp, block, AMP_IFACE, 'totalSupplyByPartition', { inputs: [part], outputs: [BigNumber.from(supply)]});
-            const value: BigNumber = await fetcher.getTotalSupplyByPartition(block, part);
-            console.log(value);
-            expect(value).toStrictEqual(BigNumber.from(supply));
-        }
-    })
-
 });
