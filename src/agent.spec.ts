@@ -84,7 +84,8 @@ describe("Forta Manager high transfer by partition agent test suite", () => {
         
         const findings: Finding[] = await handler(tx);
         expect(findings).toStrictEqual([
-            transferByPartitionFinding(PARTITIONS[0], createAddress('0xdead'), createAddress('0xcccc'), "3243223"),            
+            transferByPartitionFinding(PARTITIONS[0], createAddress('0xdead'), createAddress('0xcccc'), "3243223"),  
+            transferByPartitionFinding(PARTITIONS[1], createAddress('0x9898'), createAddress('0x1212'), "99999")          
         ]);
     });
 });
