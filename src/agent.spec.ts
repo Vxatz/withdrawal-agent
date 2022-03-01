@@ -10,7 +10,7 @@ import { Interface } from "@ethersproject/abi";
 // const SIGNATURE: string = "event TransferByPartition( bytes32 indexed fromPartition, address operator, address indexed from, address indexed to, uint256 value, bytes data, bytes operatorData )";
 const AMP_IFACE: Interface = new Interface(AMP_ABI);
 // const SIGNATURE2: string = "TransferByPartition(bytes,address,address,address,uint256,bytes,bytes)";
-const FLEXA_CONTRACT: string = createAddress("0xffff");
+const FLEXA_CONTRACT: string = createAddress("0xfffd");
 const AMP_CONTRACT: string = createAddress("0xffff");
 
 const PARTITIONS: string[] = [
