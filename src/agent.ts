@@ -3,7 +3,7 @@ import utils, { createFinding, AMP_CONTRACT, FLEXA_MANAGER_CONTRACT } from './ut
 import Fetcher from './fetcher';
 import { BigNumber } from 'ethers';
 
-const PERCENT: BigNumber = BigNumber.from(1);
+const PERCENT: BigNumber = BigNumber.from(10);
 
 export const provideHandleTransaction = (
   fetcher: Fetcher,
