@@ -11,12 +11,12 @@ export const AMP_CONTRACT: string = "0xff20817765cb7f73d4bde2e66e067e58d11095c2"
 export const AMP_ABI: string[] = [
     "function totalSupplyByPartition(bytes32) view returns (uint256)",
     "event TransferByPartition( bytes32 indexed fromPartition, address operator, address indexed from, address indexed to, uint256 value, bytes data, bytes operatorData )"
-]
+];
 
 export const transferByPartitionFinding = (log: LogDescription): Finding => Finding.fromObject({
   name: "Flexa Collateral Manager high transfer by partition detected",
   description: "High Transfer by Partition",
-  alertId: "flexa-2-3",
+  alertId: "FLEXA-2",
   severity: FindingSeverity.Info,
   type: FindingType.Suspicious,
   protocol: "Flexa",
@@ -36,4 +36,4 @@ export default {
     AMP_CONTRACT,
     AMP_ABI,  
     transferByPartitionFinding
-}
+};

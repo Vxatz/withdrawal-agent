@@ -5,3 +5,7 @@ text.bak
 agent.bak
 agent.spec.bak
 agentspec.bak
+.gitignore
+.dockerignore
+partition.fetcher.spec.bak
+partition.fetcher.bak
