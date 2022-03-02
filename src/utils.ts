@@ -18,7 +18,7 @@ export const transferByPartitionFinding = (log: LogDescription): Finding => Find
   description: "High Transfer by Partition",
   alertId: "FLEXA-2",
   severity: FindingSeverity.Info,
-  type: FindingType.Suspicious,
+  type: FindingType.Info,
   protocol: "Flexa",
   metadata: {
     fromPartition: log.args['fromPartition'].toLowerCase(),

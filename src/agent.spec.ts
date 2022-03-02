@@ -21,7 +21,7 @@ const transferByPartitionFinding = (fromPartition: string, fromAddress: string, 
   description: "High Transfer by Partition",
   alertId: "FLEXA-2",
   severity: FindingSeverity.Info,
-  type: FindingType.Suspicious,
+  type: FindingType.Info,
   protocol: "Flexa",
   metadata: { fromPartition, fromAddress, toAddress, amount },
 });
