@@ -26,7 +26,7 @@ const transferByPartitionFinding = (fromPartition: string, fromAddress: string, 
   metadata: { fromPartition, fromAddress, toAddress, amount },
 });
 
-describe("Forta Manager high transfer by partition agent test suite", () => {
+describe("Forta Collateral Manager large transfer by partition agent test suite", () => {
     const mockIsPartition = jest.fn();
     const mockGetTotalSupplyByPartition = jest.fn();
     const FLEXA_CONTRACT: string = createAddress("0xfffd");
@@ -49,8 +49,8 @@ describe("Forta Manager high transfer by partition agent test suite", () => {
         when(mockIsPartition)
             .calledWith(42, PARTITIONS[0]).mockReturnValue(true);
 
-        const tx: TransactionEvent = new TestTransactionEvent();
-        const findings: Finding[] = await handler(tx);
+        const txEvent: TransactionEvent = new TestTransactionEvent();
+        const findings: Finding[] = await handler(txEvent);
         expect(findings).toStrictEqual([]);   
         expect(mockGetTotalSupplyByPartition).toBeCalled;   
     });
@@ -76,7 +76,7 @@ describe("Forta Manager high transfer by partition agent test suite", () => {
 
     })
 
-    it("should detect multiple TransferByPartitionEvents", async () => {
+    it("should detect multiple TransferByPartition events", async () => {
         when(mockIsPartition)
             .calledWith(42, PARTITIONS[0]).mockReturnValue(true)
             .calledWith(42, PARTITIONS[2]).mockReturnValue(true);

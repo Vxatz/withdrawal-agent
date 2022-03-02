@@ -41,7 +41,7 @@ describe("Fetcher test suite", () => {
         }
     });
 
-    it("should set the flexa manager correctly", async () => {
+    it("should set the flexa collateral manager correctly", async () => {
         for(let i = 0; i < 10; ++i){
         const addr: string = createAddress(`0xfff${i}`);
         const fetcher: Fetcher = new Fetcher(amp, addr, mockProvider as any);
