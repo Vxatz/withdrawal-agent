@@ -1,7 +1,7 @@
 {
   "name": "flexa-2",
   "version": "0.0.1",
-  "description": "Detects large transfer by partition events in Flexa Collateral Manager",
+  "description": "Detects large transfer by partition events from a Flexa Collateral Manager partition",
   "scripts": {
     "build": "tsc",
     "start": "npm run start:dev",

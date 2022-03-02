@@ -1,4 +1,4 @@
-# Flexa Collateral Manager Large Transfers by Partition
+# Large Transfers from a Flexa Collateral Manager Partition
 
 ## Description
 
@@ -11,7 +11,7 @@ This agent detects large transfers from Flexa Collateral Manager contract partit
 ## Alerts
 
 - FLEXA-2 
-    * Fired when it detects `TransferByPartition` events emitted from the `Flexa Collater Manager` contract with a large amount.
+    * Fired when it detects `TransferByPartition` events emitted from the `AMP` contract with a large amount transferred from a `Flexa Collater Manager` partition
     * Severity is always set to "Info".
     * Type is always set to "Info".
     * Metadata contains: 

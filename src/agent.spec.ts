@@ -17,8 +17,8 @@ const PARTITIONS: string[] = [
 ];
 
 const transferByPartitionFinding = (fromPartition: string, fromAddress: string, toAddress: string, amount: string): Finding => Finding.fromObject({
-  name: "Flexa Collateral Manager high transfer by partition detected",
-  description: "High Transfer by Partition",
+  name: "Large transfer by a Flexa Collateral Manager partition detected",
+  description: "TransferByPartition event emitted with a large amount",
   alertId: "FLEXA-2",
   severity: FindingSeverity.Info,
   type: FindingType.Info,
